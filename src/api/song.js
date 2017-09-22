@@ -1,10 +1,19 @@
-import {commonParams,options} from './config'
+import {commonParams} from './config'
+import axios from 'axios'
 
-export function getSong(){
-  const url = '';
+export function getLyric(id) {
+  const url = '/api/getLyric';
 
-  const data = Object.assign({}, commonParams, {}
-  )
+  const data = Object.assign({}, commonParams, {
+    musicid: id,
+    nobase64: 1,
+    songtype: 0,
+    format: 'json'
+  })
 
-  return jsonp(url, data, options)
+  return axios.get(url, {
+    params: data
+  }).then((res) => {
+    return Promise.resolve(res.data)
+  })
 }

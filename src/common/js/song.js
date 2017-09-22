@@ -1,3 +1,7 @@
+import {getLyric} from 'api/song'
+import {ERR_OK} from 'api/config'
+import {htmlDecode} from 'common/js/util'
+
 class Song {
   constructor({id, mid, singer, name, album, duration, image, url}) {
     this.id = id
@@ -8,6 +12,23 @@ class Song {
     this.duration = duration
     this.image = image
     this.url = url
+  }
+
+  getLyric() {
+    if (this.lyric) {
+      return Promise.resolve(this.lyric);
+    } else {
+      return new Promise((resolve, reject) => {
+        getLyric(this.id).then((res) => {
+          if (res.code === ERR_OK) {
+            this.lyric = htmlDecode(res.lyric);
+            resolve(this.lyric);
+          } else {
+            reject('no lyric')
+          }
+        })
+      })
+    }
   }
 }
 
@@ -25,6 +46,13 @@ export function createSong(musicData) {
       url: `http://ws.stream.qqmusic.qq.com/${musicData.songid}.m4a?fromtag=46`
     }
   )
+}
+
+// 获取当前歌曲在列表中的索引
+export function findSongIndex(list, song) {
+  return list.findIndex((item) => {
+    return item.id === song.id;
+  })
 }
 
 // 处理歌手名字
